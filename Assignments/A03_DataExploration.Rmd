@@ -1,6 +1,6 @@
 ---
 title: "Assignment 3: Data Exploration"
-author: "Student Name"
+author: "Jack Alcorn"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -23,25 +23,30 @@ The completed exercise is due on <>.
 
 1. Check your working directory, load necessary packages (tidyverse), and upload two datasets: the ECOTOX neonicotinoid dataset (ECOTOX_Neonicotinoids_Insects_raw.csv) and the Niwot Ridge NEON dataset for litter and woody debris (NEON_NIWO_Litter_massdata_2018-08_raw.csv). Name these datasets "Neonics" and "Litter", respectively. 
 ```{r,  message = FALSE}
-
+getwd()
+setwd("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021")
+library(tidyverse)
+library(lubridate)
+Neonics <- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv", header = TRUE)
+Litter <- read.csv('Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv')
 ```
 
 ## Learn about your system
 
 2. The neonicotinoid dataset was collected from the Environmental Protection Agency's ECOTOX Knowledgebase, a database for ecotoxicology research. Neonicotinoids are a class of insecticides used widely in agriculture. The dataset that has been pulled includes all studies published on insects. Why might we be interested in the ecotoxicologoy of neonicotinoids on insects? Feel free to do a brief internet search if you feel you need more background information. 
 
-> Answer: 
+> Answer: Neonics have been shown to have adverse effects on honey-bee populations and to also be harmful to birds by reducing overall insect populations. 
 
 3. The Niwot Ridge litter and woody debris dataset was collected from the National Ecological Observatory Network, which collectively includes 81 aquatic and terrestrial sites across 20 ecoclimatic domains. 32 of these sites sample forest litter and woody debris, and we will focus on the Niwot Ridge long-term ecological research (LTER) station in Colorado. Why might we be interested in studying litter and woody debris that falls to the ground in forests? Feel free to do a brief internet search if you feel you need more background information. 
 
-> Answer: 
+> Answer: Looking at forest litter can be useful in understanding the successional stage of a forest. It can also be used to analyze the ecosystem and animals who depend on litter and woody debris to live. Lastly, it could be used for wildfire management. Forest with an overabundance of litter and woody debris could need a prescribed burn.  
 
 4. How is litter and woody debris sampled as part of the NEON network? Read the NEON_Litterfall_UserGuide.pdf document to learn more. List three pieces of salient information about the sampling methods here: 
 
-> Answer: 
-*
-*
-*
+> Answer: Litter was collected in sites where woody vegetation is greater than 2 meters tall. 40x40m and 20x20m plots with 10x10m and 1x1m nested subplots were created to sample the litter and woody debris. 
+* deciduous forests were sampled during senescence and evergreen forests were sampled year round
+* In sites with with greater than 50% aerial cover of woody vegetaion greater than 2m in height, placement of litter traps is random
+* litter is defined as material that is dropped from the forest canopy and has a butt end diameter<2cm and a length <50 cm
 
 
 
@@ -50,12 +55,12 @@ The completed exercise is due on <>.
 5. What are the dimensions of the dataset?
 
 ```{r}
-
+dim(Neonics)
 ```
 
 6. Using the `summary` function on the "Effects" column, determine the most common effects that are studied. Why might these effects specifically be of interest?
 ```{r}
-
+summary(Neonics$Effect)
 ```
 
 > Answer: 
@@ -63,7 +68,7 @@ The completed exercise is due on <>.
 7. Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.
 
 ```{r}
-
+summary(Neonics$Species.Common.Name)
 ```
 
 > Answer: 
@@ -71,10 +76,10 @@ The completed exercise is due on <>.
 8. Concentrations are always a numeric value. What is the class of Conc.1..Author. in the dataset, and why is it not numeric?
 
 ```{r}
-
+class(Neonics$Conc.1..Author.)
 ```
 
-> Answer:
+> Answer: It is a character. It could be becuase the concentrations are in different units. 
 
 
 
@@ -82,25 +87,25 @@ The completed exercise is due on <>.
 
 9. Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year. 
 ```{r}
-
+ggplot(Neonics) + geom_freqpoly(aes(x=Publication.Year))
 ```
 
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 ```{r}
-
+ggplot(Neonics) + geom_freqpoly(aes(x=Publication.Year, color = Test.Location))
 ```
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
 
-> Answer: 
+> Answer: The most common test locations are the lab and the natural field. The natural field has been pretty constant with a sharp spike around 2010. Lab locations have increase from 1990 to 2015 and decreased from 2015 to 2020. 
 
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information. 
 
 ```{r}
-
+ggplot(Neonics, aes(x=Endpoint)) +geom_bar() + theme(axis.text.x = element_text(angle = 90))
 ```
 
-> Answer: 
+> Answer: The two most common endpoints are LOEL and NOEL. LOEL is Lowest-observable-effect-level: lowest dose (concentration) producing effects that were significantly different and NOEL is No-observable-effect-level: highest dose (concentration) producing effects not significantly different from responses of controls.  
 >
 
 ## Explore your data (Litter)
