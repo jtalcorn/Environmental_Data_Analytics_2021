@@ -27,8 +27,8 @@ getwd()
 setwd("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021")
 library(tidyverse)
 library(lubridate)
-Neonics <- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv", header = TRUE)
-Litter <- read.csv('Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv')
+Neonics <- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv", header = TRUE, stringsAsFactors = TRUE)
+Litter <- read.csv('Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv', header = TRUE, stringsAsFactors = TRUE)
 ```
 
 ## Learn about your system
@@ -63,7 +63,7 @@ dim(Neonics)
 summary(Neonics$Effect)
 ```
 
-> Answer: 
+> Answer: Population and mortality are the the most common effects studied. These are important to monitor the number of insects/honey-bees in the ecosystem. Severe declines in population or severe increases in mortality of insects/honey-bees can have disastrous effects on animals and plants that depend on these insects and honey bees. 
 
 7. Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.
 
@@ -71,7 +71,7 @@ summary(Neonics$Effect)
 summary(Neonics$Species.Common.Name)
 ```
 
-> Answer: 
+> Answer: The Honey Bee, Parasitic Wasp, Buff Tailed Bumblebee, Carniolan Honey Bee, Bumble Bee, and Italian Honeybee are the six most studied species in the data set. All of these insects are pollinators and would be of importance to crops. Without these pollinators, crops would not be as productive. 
 
 8. Concentrations are always a numeric value. What is the class of Conc.1..Author. in the dataset, and why is it not numeric?
 
@@ -126,7 +126,7 @@ unique(Litter$plotID)
 summary(Litter$plotID)
 ```
 
-> Answer: 12 different plots were sampled at NIWOT Ridge. The unique function tells you how many unique values are in a column. It eliminates duplicate values. The summary function tells us how many samples total were taken. 
+> Answer: 12 different plots were sampled at NIWOT Ridge. The unique function tells you how many unique values are in a column. It eliminates duplicate values. The summary function tells us how many samples in each plot were taken. 
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 ```{r}
