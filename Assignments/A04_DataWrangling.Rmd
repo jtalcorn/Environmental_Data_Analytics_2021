@@ -1,6 +1,6 @@
 ---
 title: "Assignment 4: Data Wrangling"
-author: "Student Name"
+author: "Jack Alcorn"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -25,8 +25,15 @@ The completed exercise is due on Tuesday, Feb 16 @ 11:59pm.
 
 ```{r, message = FALSE}
 #1
-
+getwd()
+library(tidyverse)
+library(lubridate)
+EPAair_03_NC2018<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/EPAair_O3_NC2018_raw.csv", header = TRUE, stringsAsFactors = TRUE)
+EPAair_03_NC2019<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/EPAair_O3_NC2018_raw.csv", header = TRUE, stringsAsFactors = TRUE)
+EPAair_PM25_NC2018<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/EPAair_PM25_NC2018_raw.csv", header = TRUE, stringsAsFactors = TRUE)
+EPAair_PM25_NC2019<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/EPAair_PM25_NC2019_raw.csv", header = TRUE, stringsAsFactors = TRUE)
 #2
+
 ```
 
 ## Wrangle individual datasets to create processed files.
@@ -37,6 +44,10 @@ The completed exercise is due on Tuesday, Feb 16 @ 11:59pm.
 
 ```{r}
 #3
+EPAair_03_NC2018$Date <- as.Date(EPAair_03_NC2018$Date, format = "%m/%d/%Y")
+EPAair_03_NC2019$Date <- as.Date(EPAair_03_NC2019$Date, format = "%m/%d/%Y")
+EPAair_PM25_NC2018$Date <- as.Date(EPAair_PM25_NC2018$Date, format = "%m/%d/%Y")
+EPAair_PM25_NC2019$Date <- as.Date(EPAair_PM25_NC2019$Date, format = "%m/%d/%Y")
 
 #4
 
