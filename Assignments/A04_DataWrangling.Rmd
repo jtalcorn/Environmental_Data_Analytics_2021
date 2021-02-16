@@ -29,10 +29,23 @@ getwd()
 library(tidyverse)
 library(lubridate)
 EPAair_03_NC2018<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/EPAair_O3_NC2018_raw.csv", header = TRUE, stringsAsFactors = TRUE)
-EPAair_03_NC2019<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/EPAair_O3_NC2018_raw.csv", header = TRUE, stringsAsFactors = TRUE)
+EPAair_03_NC2019<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/EPAair_O3_NC2019_raw.csv", header = TRUE, stringsAsFactors = TRUE)
 EPAair_PM25_NC2018<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/EPAair_PM25_NC2018_raw.csv", header = TRUE, stringsAsFactors = TRUE)
 EPAair_PM25_NC2019<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Raw/EPAair_PM25_NC2019_raw.csv", header = TRUE, stringsAsFactors = TRUE)
 #2
+dim(EPAair_03_NC2018)
+dim(EPAair_03_NC2019)
+dim(EPAair_PM25_NC2018)
+dim(EPAair_PM25_NC2019)
+str(EPAair_03_NC2018)
+str(EPAair_03_NC2019)
+str(EPAair_PM25_NC2018)
+str(EPAair_PM25_NC2019)
+colnames(EPAair_03_NC2018)
+colnames(EPAair_03_NC2019)
+colnames(EPAair_PM25_NC2018)
+colnames(EPAair_PM25_NC2019)
+
 
 ```
 
@@ -82,16 +95,25 @@ write.csv(EPAair_PM25_NC2019_refined2, row.names = FALSE, file = "Z:/ENV_872_Dat
 11. Save your processed dataset with the following file name: "EPAair_O3_PM25_NC1718_Processed.csv"
 
 ```{r}
-#7
+#7 combined all four data sets
 combined_EPAdata <- rbind(EPAair_03_NC2018_refined, EPAair_03_NC2019_refined, EPAair_PM25_NC2018_refined2, EPAair_PM25_NC2019_refined2)
-#8
-
+#8 filtered all the site names that each dataset have in common, then grouped the certain columns generate daily means 
+combined_EPAdata_select <-
+  combined_EPAdata %>%
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School"))%>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY)%>%
+  summarise(meanAQI = mean(DAILY_AQI_VALUE),
+            meanlat = mean(SITE_LATITUDE),
+            meanlong = mean(SITE_LONGITUDE))%>%
+  mutate(month = month(Date), year = year(Date))
+  
 #9
+combined_EPA_Spread <- pivot_wider(combined_EPAdata_select, names_from = AQS_PARAMETER_DESC, values_from = meanAQI)
 
 #10
-
+dim(combined_EPA_Spread)
 #11
-
+write.csv(combined_EPA_Spread, row.names = FALSE, file = "./Data/Processed/EPAair_O3_PM25_NC1718_Processed.csv")
 ```
 
 
@@ -102,13 +124,19 @@ combined_EPAdata <- rbind(EPAair_03_NC2018_refined, EPAair_03_NC2019_refined, EP
 
 ```{r}
 #12a
+combined_EPA_Summary <- 
+  combined_EPA_Spread%>%
+  group_by(Site.Name, month, year)%>%
+  summarise(mean_ozone = mean(Ozone),
+            mean_PM2.5 = mean(PM2.5))%>%
+  drop_na(month, year)
 
 #12b
 
 #13
-
+dim(combined_EPA_Summary)
 ```
 
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
-> Answer: 
+> Answer: The drop_na function drops rows containing missing values where the na.omit function returns the object with observations removed if they contain any missing values. using the drop_na function allowed us to keep rows with NA's in them. With drop_na, we had 308 observations and with na.omit there was 101 observations. na.omit removed all the rows with nas in it. 
