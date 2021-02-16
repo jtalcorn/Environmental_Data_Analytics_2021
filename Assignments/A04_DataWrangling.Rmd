@@ -43,18 +43,28 @@ EPAair_PM25_NC2019<- read.csv("Z:/ENV_872_Data_Analy/Environmental_Data_Analytic
 6. Save all four processed datasets in the Processed folder. Use the same file names as the raw files but replace "raw" with "processed".
 
 ```{r}
-#3
+#3 
+#changed date to date
 EPAair_03_NC2018$Date <- as.Date(EPAair_03_NC2018$Date, format = "%m/%d/%Y")
 EPAair_03_NC2019$Date <- as.Date(EPAair_03_NC2019$Date, format = "%m/%d/%Y")
 EPAair_PM25_NC2018$Date <- as.Date(EPAair_PM25_NC2018$Date, format = "%m/%d/%Y")
 EPAair_PM25_NC2019$Date <- as.Date(EPAair_PM25_NC2019$Date, format = "%m/%d/%Y")
 
 #4
-
+#selected desired columns
+EPAair_03_NC2018_refined <- select(EPAair_03_NC2018, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPAair_03_NC2019_refined <- select(EPAair_03_NC2019, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPAair_PM25_NC2018_refined <-select(EPAair_PM25_NC2018, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPAair_PM25_NC2019_refined <-select(EPAair_PM25_NC2019, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
 #5
-
+#mutated AQS column to have only "PM2.5"
+EPAair_PM25_NC2018_refined2 <- mutate(EPAair_PM25_NC2018_refined, AQS_PARAMETER_DESC = "PM2.5")
+EPAair_PM25_NC2019_refined2 <- mutate(EPAair_PM25_NC2019_refined, AQS_PARAMETER_DESC = "PM2.5")
 #6
-
+write.csv(EPAair_03_NC2018_refined, row.names = FALSE, file = "Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Processed/EPAair_O3_NC2018_processed.csv")
+write.csv(EPAair_03_NC2019_refined, row.names = FALSE, file = "Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Processed/EPAair_O3_NC2019_processed.csv")
+write.csv(EPAair_PM25_NC2018_refined2, row.names = FALSE, file = "Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Processed/EPAair_PM25_NC2018_processed.csv")
+write.csv(EPAair_PM25_NC2019_refined2, row.names = FALSE, file = "Z:/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Processed/EPAair_PM25_NC2019_processed.csv")
 ```
 
 
@@ -73,7 +83,7 @@ EPAair_PM25_NC2019$Date <- as.Date(EPAair_PM25_NC2019$Date, format = "%m/%d/%Y")
 
 ```{r}
 #7
-
+combined_EPAdata <- rbind(EPAair_03_NC2018_refined, EPAair_03_NC2019_refined, EPAair_PM25_NC2018_refined2, EPAair_PM25_NC2019_refined2)
 #8
 
 #9
