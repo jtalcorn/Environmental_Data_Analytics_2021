@@ -1,6 +1,6 @@
 ---
 title: "Assignment 5: Data Visualization"
-author: "Student Name"
+author: "Jack Alcorn"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -33,16 +33,33 @@ the processed data file for the Niwot Ridge litter dataset.
 2. Make sure R is reading dates as date format; if not change the format to date.
 
 ```{r}
-#1 
+#1
+library(ggplot2)
+library(tidyverse)
+library(cowplot)
+
+getwd()
+chem_nutr<-read.csv("/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
+nutr <- read.csv("/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv")
+NIWOT_RD<-read.csv("/ENV_872_Data_Analy/Environmental_Data_Analytics_2021/Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv")
 
 #2 
-
+chem_nutr$sampledate<- as.Date(chem_nutr$sampledate, format = "%Y-%m-%d")
+nutr$sampledate<- as.Date(nutr$sampledate, format = "%Y-%m-%d")
+NIWOT_RD$collectDate<- as.Date(NIWOT_RD$collectDate, format = "%Y-%m-%d")
+chem_nutr$month<-as.factor(chem_nutr$month)
 ```
 ## Define your theme
 3. Build a theme and set it as your default theme.
 
 ```{r}
-
+mytheme<-theme_classic(base_size = 14)+
+  theme(axis.text = element_text(color = "black"),
+        plot.title = element_text(hjust = 0.5),
+        legend.position = "right",
+        legend.justification ="center",
+        legend.background = element_rect(size=0.5, linetype="solid", 
+                                  colour ="darkblue"))
 
 ```
 
@@ -52,7 +69,16 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 4. [NTL-LTER] Plot total phosphorus (`tp_ug`) by phosphate (`po4`), with separate aesthetics for Peter and Paul lakes. Add a line of best fit and color it black. Adjust your axes to hide extreme values.
 
 ```{r}
-
+ggplot(chem_nutr, aes(x = po4, y = tp_ug, color = lakename))+
+         geom_point()+
+         xlim(0,50)+
+         ylim(0,150)+
+         xlab("Phosphate")+
+         ylab("Phosphorous")+
+         ggtitle("Phosphate & Phosphorous Levels at Peter & Paul Lake")+
+         geom_smooth(method = lm, color = "black")+
+         mytheme
+  
 
 ```
 
@@ -60,8 +86,41 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 5. [NTL-LTER] Make three separate boxplots of (a) temperature, (b) TP, and (c) TN, with month as the x axis and lake as a color aesthetic. Then, create a cowplot that combines the three graphs. Make sure that only one legend is present and that graph axes are aligned.
 
 ```{r}
+theme_set(mytheme)
+Q5plot1<-
+  ggplot(chem_nutr, aes(x = month, y = temperature_C, color = lakename))+
+  geom_boxplot()+
+  xlab("Month")+
+  ylab("Temp C")+
+  labs(color="Lake Name")
+print(Q5plot1)
 
+Q5plot2<-
+  ggplot(chem_nutr, aes(x = month, y = tp_ug, color = lakename))+
+  geom_boxplot()+
+  xlab("Month")+
+  ylab("TP mg/L")+
+  labs(color="Lake Name")
+print(Q5plot2)
 
+Q5plot3<-
+  ggplot(chem_nutr, aes(x = month, y = tn_ug, color = lakename))+
+  geom_boxplot()+
+  xlab("Month")+
+  ylab("TN mg/L")+
+  labs(color="Lake Name")
+print(Q5plot3)
+
+combined_plots <- plot_grid(
+  Q5plot1 + theme(legend.position = "none"), 
+  Q5plot2 + theme(legend.position = "none"),
+  Q5plot3 + theme(legend.position = "none"), 
+  nrow=3, align = 'h')
+ 
+legend <- get_legend(Q5plot1 + theme(legend.box.margin = margin(0, 0, 0, 12))
+)
+final_combined_plot <- plot_grid(combined_plots, legend, rel_widths = c(3, .4))
+print(final_combined_plot)
 ```
 
 Question: What do you observe about the variables of interest over seasons and between lakes? 
@@ -73,6 +132,17 @@ Question: What do you observe about the variables of interest over seasons and b
 7. [Niwot Ridge] Now, plot the same plot but with NLCD classes separated into three facets rather than separated by color. 
 
 ```{r}
+#6
+theme_set(mytheme)
+Needlesplot<-ggplot(subset(NIWOT_RD, functionalGroup == "Needles"), aes(x=collectDate, y=dryMass, color = nlcdClass))+
+  geom_point()+
+  xlab("Date Collected")+
+  ylab("Mass (g)")+
+  labs(title = "Mass of Needles", col= "NLCD Class")
+print(Needlesplot)
+final_needlesplot<-Needlesplot + scale_fill_discrete(title  ="NLCD Class",labels=c("Evergreen Forest", "Grassland", "Shrub"))
+print(final_needlesplot)
+#7
 
 ```
 Question: Which of these plots (6 vs. 7) do you think is more effective, and why? 

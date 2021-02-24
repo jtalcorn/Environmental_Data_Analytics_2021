@@ -33,6 +33,7 @@ ggsave("./Output/Plot_text.jpg",Plot_text, height = 4, width = 6, units = "in", 
 
 ```{r, message = FALSE, warning = FALSE}
 getwd()
+install.packages(viridis)
 library(tidyverse)
 library(ggridges)
 library(viridis)
@@ -60,6 +61,10 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 # Color your points by year, and facet by lake in two rows.
 # Change the ylab name
 
+ggplot(subset(PeterPaul.chem.nutrients, depth == 0), aes(y = temperature_C, x = daynum, color = year4))+
+  geom_point()+
+  facet_wrap(vars(lakename), nrow = 2)
+
 
 #2. 
 # Plot temperature by date. Color your points by depth.
@@ -67,7 +72,7 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 # Change the color palette to magma and play with direction (+- 1), which one makes more sense?
 # Change x axis to include marker/labels every 5 years
 
-
+ggplot()
 
 
 ```
@@ -82,7 +87,9 @@ Exercise: Plot relationships between air quality measurements
 # Make the points 50 % transparent
 # Add a line of best fit for the linear regression of these variables.
 
-
+ggplot(EPAair, aes(x = Ozone, y = PM2.5, color = SITE_LATITUDE))+
+  geom_point(alpha = 0.5)+
+  geom_smooth(method=lm, color = "black")
 
 
 ```
