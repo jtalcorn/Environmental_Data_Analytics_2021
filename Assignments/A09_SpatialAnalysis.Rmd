@@ -35,11 +35,14 @@ This exercise accompanies the lessons in Environmental Data Analytics (ENV872L) 
 getwd()
 
 #2. 
+remotes::install_github("r-spatial/mapview")
+library(mapview)
 library(dplyr)
 library(tidyverse)
 library(sf)
 library(leaflet)
-library(mapview)
+
+
 
 Mytheme<-theme_classic(base_size = 14)+
   theme(axis.text = element_text(color = "black"),
@@ -62,7 +65,7 @@ In this exercise, we will be exploring stream gage height data in Nebraska corre
 
 ```{r Read the county data into an sf dataframe}
 #3. Read in Counties shapefile into an sf dataframe, filtering for just NE counties
-NE_gage<-st_read("../Data/Spatial/cb_2018_us_county_20m.shp")%>%
+NE_gage<-st_read("./Data/Spatial/cb_2018_us_county_20m.shp")%>%
   filter(STATEFP == 31)
 
 #4. Reveal the CRS of the counties features
@@ -88,7 +91,7 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 ```{r Read in USGS Gage Locations}
 #7. Read in gage locations csv as a dataframe
-Gage_loc<-read.csv("../Data/Raw/NWIS_SiteInfo_NE_RAW.csv")
+Gage_loc<-read.csv("./Data/Raw/NWIS_SiteInfo_NE_RAW.csv")
 
 #8. Reveal the names of the columns
 colnames(Gage_loc)
@@ -157,7 +160,7 @@ Lastly, we want to attach some gage height data to our site locations. I've cons
 
 ```{r}
 #14. Read the site flow data into a data frame
-Gage_Hts<-read.csv("../Data/Raw/NWIS_SiteFlowData_NE_RAW.csv")
+Gage_Hts<-read.csv("./Data/Raw/NWIS_SiteFlowData_NE_RAW.csv")
 
 #15. Show the column names
 colnames(Gage_Hts)
