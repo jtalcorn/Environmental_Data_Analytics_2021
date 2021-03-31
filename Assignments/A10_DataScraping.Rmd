@@ -145,10 +145,10 @@ PSWID_tag <-"td tr:nth-child(1) td:nth-child(5)"
 Ownership_tag<-"div+ table tr:nth-child(2) td:nth-child(4)"
 MGD_tag<- "th~ td+ td"
 
-system_name <- the_website %>% html_nodes(the_registrant_tag) %>% html_text()
-PSWID <- the_website %>%   html_nodes(the_facility_name_tag) %>%  html_text()
-Ownershiop <- the_website %>% html_nodes(the_facility_id_tag) %>% html_text()
-MGD <- the_website %>% html_nodes(the_data_tag) %>% html_text()
+system_name <- the_website %>% html_nodes(system_name_tag) %>% html_text()
+PSWID <- the_website %>%   html_nodes(PSWID_tag) %>%  html_text()
+Ownership <- the_website %>% html_nodes(Ownership_tag) %>% html_text()
+MGD <- the_website %>% html_nodes(MGD_tag) %>% html_text()
 
 df_withdrawals<- data.frame("MGD" = as.numeric(MGD),
                             "System Name" = system_name,
@@ -207,7 +207,7 @@ plot(durm_2015)
 
 8. Use the function above to extract data for Asheville (PWSID = 01-11-010) in 2015. Combine this data with the Durham data collected above and create a plot that compares the Asheville to Durham's water withdrawals.
 
-```{r fetch.and.plot.Durham.2015.data}
+```{r fetch.and.plot.Asheville.2015.data}
 #8
 the_OG_url <- 'https://www.ncwater.org/WUDC/app/LWSP/report.php?'
 the_PWSID <- '01-11-010'
