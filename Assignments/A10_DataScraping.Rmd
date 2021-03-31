@@ -1,6 +1,6 @@
 ---
 title: "Assignment 10: Data Scraping"
-author: "Student Name"
+author: "Jack Alcorn"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -31,7 +31,20 @@ The completed exercise is due on Tuesday, April 6 at 11:59 pm.
 
 ```{r, message = FALSE}
 #1
+getwd()
+library(tidyverse)
+library(lubridate)
+library(viridis)
+library(rvest)
 
+Mytheme<-theme_classic(base_size = 14)+
+  theme(axis.text = element_text(color = "black"),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.position = "right",
+        legend.justification ="center",
+        legend.background = element_rect(size=0.5, linetype="solid", 
+                                  colour ="darkblue"))
 
 ```
 
@@ -45,6 +58,7 @@ Indicate this website as the as the URL to be scraped.
 
 ```{r set.the.scraping.website}
 #2
+webpage<-read_html("https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2019")
 
 
 ```
@@ -63,7 +77,21 @@ In the code chunk below scrape these values into the supplied variable names.
 
 ```{r scrape.the.data}
 #3
+system_name <- webpage %>% 
+  html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>% 
+  html_text()
 
+PSWID <- webpage %>% 
+  html_nodes("td tr:nth-child(1) td:nth-child(5)") %>% 
+  html_text()
+
+Ownership<- webpage %>% 
+  html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>% 
+  html_text()
+
+MGD<- webpage %>% 
+  html_nodes("th~ td+ td") %>% 
+  html_text()
 
 ```
 
@@ -76,12 +104,28 @@ In the code chunk below scrape these values into the supplied variable names.
 
 ```{r create.a.dataframe.from.scraped.data}
 #4
+df_withdrawals<- data.frame("MGD" = as.numeric(MGD),
+                            "System Name" = system_name,
+                            "Ownership" = Ownership,
+                            "PSWID" = PSWID,
+                            "Month" = rep(1:12),
+                             "Year" = rep(2019,12))
 
+df_withdrawals <- df_withdrawals %>% 
+  mutate(Date = my(paste(Month,"-",Year)))
+                    
 
 
 #5
 
-
+ggplot(df_withdrawals,aes(x=Date,y=MGD)) + 
+  geom_line() + 
+  geom_smooth(method="loess",se=FALSE) +
+  labs(title ="2019 Max Daily Withdrawals",
+       subtitle = "Durham",
+       y="Withdrawal (mgd)",
+       x="Date")+
+  Mytheme
 
 ```
 
@@ -89,6 +133,32 @@ In the code chunk below scrape these values into the supplied variable names.
 
 ```{r construct.a.scraping.function}
 #6.
+the_OG_url <- 'https://www.ncwater.org/WUDC/app/LWSP/report.php?'
+the_PWSID <- '03-32-010'
+the_year <- 2019
+the_scrape_url <- paste0(the_OG_url, 'pwsid=', the_PWSID, '&', "year=", the_year)
+
+the_website <- read_html(the_scrape_url)
+
+system_name_tag <-"div+ table tr:nth-child(1) td:nth-child(2)"
+PSWID_tag <-"td tr:nth-child(1) td:nth-child(5)"
+Ownership_tag<-"div+ table tr:nth-child(2) td:nth-child(4)"
+MGD_tag<- "th~ td+ td"
+
+system_name <- the_website %>% html_nodes(the_registrant_tag) %>% html_text()
+PSWID <- the_website %>%   html_nodes(the_facility_name_tag) %>%  html_text()
+Ownershiop <- the_website %>% html_nodes(the_facility_id_tag) %>% html_text()
+MGD <- the_website %>% html_nodes(the_data_tag) %>% html_text()
+
+df_withdrawals<- data.frame("MGD" = as.numeric(MGD),
+                            "System Name" = system_name,
+                            "Ownership" = Ownership,
+                            "PSWID" = PSWID,
+                            "Month" = rep(1:12),
+                             "Year" = rep(the_year,12))%>%
+                            mutate(Date = my(paste(Month,"-",Year)))
+
+
 
 
 
@@ -98,7 +168,40 @@ In the code chunk below scrape these values into the supplied variable names.
 
 ```{r fetch.and.plot.Durham.2015.data}
 #7
+the_OG_url <- 'https://www.ncwater.org/WUDC/app/LWSP/report.php?'
+the_PWSID <- '03-32-010'
+the_year <- 2015
+the_scrape_url <- paste0(the_OG_url, 'pwsid=', the_PWSID, '&', "year=", the_year)
 
+the_website <- read_html(the_scrape_url)
+
+system_name_tag <-"div+ table tr:nth-child(1) td:nth-child(2)"
+PSWID_tag <-"td tr:nth-child(1) td:nth-child(5)"
+Ownership_tag<-"div+ table tr:nth-child(2) td:nth-child(4)"
+MGD_tag<- "th~ td+ td"
+
+system_name <- the_website %>% html_nodes(system_name_tag) %>% html_text()
+PSWID <- the_website %>%   html_nodes(PSWID_tag) %>%  html_text()
+Ownershiop <- the_website %>% html_nodes(Ownership_tag) %>% html_text()
+MGD <- the_website %>% html_nodes(MGD_tag) %>% html_text()
+
+df_withdrawals_durm2015<- data.frame("MGD" = as.numeric(MGD),
+                            "System Name" = system_name,
+                            "Ownership" = Ownership,
+                            "PSWID" = PSWID,
+                            "Month" = rep(1:12),
+                             "Year" = rep(the_year,12))%>%
+                            mutate(Date = my(paste(Month,"-",Year)))
+
+durm_2015<-ggplot(df_withdrawals_durm2015,aes(x=Date,y=MGD)) + 
+  geom_line() + 
+  geom_smooth(method="loess",se=FALSE) +
+  labs(title ="2015 Max Daily Withdrawals",
+       subtitle = "Durham",
+       y="Withdrawal (mgd)",
+       x="Date")+
+  Mytheme
+plot(durm_2015)
 
 ```
 
@@ -106,8 +209,50 @@ In the code chunk below scrape these values into the supplied variable names.
 
 ```{r fetch.and.plot.Durham.2015.data}
 #8
+the_OG_url <- 'https://www.ncwater.org/WUDC/app/LWSP/report.php?'
+the_PWSID <- '01-11-010'
+the_year <- 2015
+the_scrape_url <- paste0(the_OG_url, 'pwsid=', the_PWSID, '&', "year=", the_year)
 
+the_website <- read_html(the_scrape_url)
 
+system_name_tag <-"div+ table tr:nth-child(1) td:nth-child(2)"
+PSWID_tag <-"td tr:nth-child(1) td:nth-child(5)"
+Ownership_tag<-"div+ table tr:nth-child(2) td:nth-child(4)"
+MGD_tag<- "th~ td+ td"
+
+system_name <- the_website %>% html_nodes(system_name_tag) %>% html_text()
+PSWID <- the_website %>%   html_nodes(PSWID_tag) %>%  html_text()
+Ownershiop <- the_website %>% html_nodes(Ownership_tag) %>% html_text()
+MGD <- the_website %>% html_nodes(MGD_tag) %>% html_text()
+
+df_withdrawals_ash2015<- data.frame("MGD" = as.numeric(MGD),
+                            "System Name" = system_name,
+                            "Ownership" = Ownership,
+                            "PSWID" = PSWID,
+                            "Month" = rep(1:12),
+                             "Year" = rep(the_year,12))%>%
+                            mutate(Date = my(paste(Month,"-",Year)))
+
+ashville_2015<-ggplot(df_withdrawals_ash2015,aes(x=Date,y=MGD)) + 
+  geom_line() + 
+  geom_smooth(method="loess",se=FALSE) +
+  labs(title ="2015 Max Daily Withdrawals",
+       subtitle = "Asheville",
+       y="Withdrawal (mgd)",
+       x="Date")+
+  Mytheme
+plot(ashville_2015)
+
+combined_data<-rbind(df_withdrawals_durm2015, df_withdrawals_ash2015)
+
+combined_plot<- ggplot(combined_data, aes(x=Date, y = MGD, color = System.Name))+
+  geom_line()+
+  labs(title ="2015 Max Daily Withdrawals",
+       y="Withdrawal (mgd)",
+       x="Date")+
+  Mytheme
+plot(combined_plot)
 ```
 
 
@@ -115,7 +260,7 @@ In the code chunk below scrape these values into the supplied variable names.
 
 ```{r}
 #9
-
+#ran out of time this week working on MP. :/
 
 ```
 
