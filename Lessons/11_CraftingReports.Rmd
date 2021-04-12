@@ -66,16 +66,31 @@ See: <https://rmarkdown.rstudio.com> and class recording.
 <Fill in our discussion below with bullet points. Use italics and bold for emphasis (hint: use the cheat sheets or `Help` →`Markdown Quick Reference` to figure out how to make bold and italic text).> 
 
 
+* R Markdown is __FREE__
+
+* R Markdown allows for your *code* and *results* to be documented and shared
+
+* R Markdown converts your results to a **PDF**
+
 ## TEXT EDITING CHALLENGE
 
 Create a table below that details the example datasets we have been using in class. The first column should contain the names of the datasets and the second column should include some relevant information about the datasets. (Hint: use the cheat sheets to figure out how to make a table in Rmd)
 
+Data set Name  | Relevant Information 
+-------------- | --------------------
+Peter Paul     | Temperature of Lakes
+EPA Air        | Air Pollutants
 
 ## R CHUNK EDITING CHALLENGE
 
 ### Installing packages
 
 Create an R chunk below that installs the package `knitr`. Instead of commenting out the code, customize the chunk options such that the code is not evaluated (i.e., not run).
+```{r installpackages, eval=FALSE, include=FALSE}
+install.packages("knitr")
+
+```
+
 
 
 ### Setup
@@ -85,6 +100,28 @@ Create an R chunk below called "setup" that checks your working directory, loads
 Load the NTL-LTER_Lake_Nutrients_Raw dataset, display the head of the dataset, and set the date column to a date format.
 
 Customize the chunk options such that the code is run but is not displayed in the final document.
+```{r, ###Setup, include=FALSE}
+getwd()
+library(tidyverse)
+library(lubridate)
+library(knitr)
+
+Mytheme<-theme_classic(base_size = 14)+
+  theme(axis.text = element_text(color = "black"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.position = "right",
+        legend.justification ="center",
+        legend.background = element_rect(size=0.5, linetype="solid", 
+                                  colour ="darkblue"))
+
+NTL <- read.csv("../Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv")
+head(NTL)
+
+NTL$sampledate <- as.Date(NTL$sampledate, format = "%m/%d/%y")
+
+```
 
 
 ### Data Exploration, Wrangling, and Visualization
@@ -94,18 +131,66 @@ Create an R chunk below to create a processed dataset do the following operation
 -   Include all columns except lakeid, depth_id, and comments
 -   Include only surface samples (depth = 0 m)
 -   Drop rows with missing data
+```{r, #1}
+
+NTL_zero<-filter(NTL, depth == 0)
+NTL_reduced<-select(NTL_zero, lakeid, depth_id, comments)
+NTL_reduced2<-drop_na(NTL_reduced)
+
+
+```
+
 
 Create a second R chunk to create a summary dataset with the mean, minimum, maximum, and standard deviation of total nitrogen concentrations for each lake. Create a second summary dataset that is identical except that it evaluates total phosphorus. Customize the chunk options such that the code is run but not displayed in the final document.
 
+```{r, echo=FALSE}
+NTL_TN<-select(NTL, lakename, tn_ug, sampledate)
+summary(NTL_TN)
+
+NTL_TP<-select(NTL, lakename, tp_ug, sampledate)
+summary(NTL_TP)
+```
+
+
 Create a third R chunk that uses the function `kable` in the knitr package to display two tables: one for the summary dataframe for total N and one for the summary dataframe of total P. Use the `caption = " "` code within that function to title your tables. Customize the chunk options such that the final table is displayed but not the code used to generate the table.
 
+```{r, echo=FALSE}
+kable(summary(NTL_TN), "simple", caption = "Total N Summary Stats")
+kable(summary(NTL_TP), "simple", caption = "Total P Summary Stats")
+
+```
+
+
 Create a fourth and fifth R chunk that generates two plots (one in each chunk): one for total N over time with different colors for each lake, and one with the same setup but for total P. Decide which geom option will be appropriate for your purpose, and select a color palette that is visually pleasing and accessible. Customize the chunk options such that the final figures are displayed but not the code used to generate the figures. In addition, customize the chunk options such that the figures are aligned on the left side of the page. Lastly, add a fig.cap chunk option to add a caption (title) to your plot that will display underneath the figure.
+```{r, echo=FALSE, fig.cap="Total N per Lake", fig.align='left'}
+ggplot(NTL_TN, aes(x=sampledate, y=tn_ug, color = lakename))+
+    geom_point()+
+    xlab("Date")+
+    ylab("Total N")+
+    labs(color="Lake Name")+
+    Mytheme
+```
+
+```{r,echo=FALSE, fig.cap="Total P per Lake", fig.align='left'}
+ggplot(NTL_TP, aes(x=sampledate, y=tp_ug, color = lakename))+
+    geom_point()+
+    xlab("Date")+
+    ylab("Total P")+
+    labs(color="Lake Name")+
+    Mytheme
+```
 
 
 ### Communicating results
 
 Write a paragraph describing your findings from the R coding challenge above. This should be geared toward an educated audience but one that is not necessarily familiar with the dataset. Then insert a horizontal rule below the paragraph. Below the horizontal rule, write another paragraph describing the next steps you might take in analyzing this dataset. What questions might you be able to answer, and what analyses would you conduct to answer those questions?
 
+>Results:
+The analysis done above show the the total nitrogen and phosphorous levels of each lake in our data set. Once again, the data set consisted of surface level nitrogen and phosphorous values found in lakes over a twenty year time span. From our graphs, we can tell that the total nitrogen and phosphorous levels have decreased in the past twenty years. 
+
+***
+
+>Future studeis: Moving forward, it would also be important to see how nitrogen and phosphorous levels changed over the past twenty years as we decreased in depth. This would be important for bottowm dwelling species found in lakes. Another question to look at would be, are there lakes that increase in nitrogen and phosporous levels over time? Our graphs indicated that most levels descreased but if we look at lakes individually we might find lakes that increased over the past twenty years. If there are examples of this, more research could be done to hypthosize why this may be the case. Are these lakes close to agriculture or cities?  
 
 ## KNIT YOUR PDF
 When you have completed the above steps, try knitting your PDF to see if all of the formatting options you specified turned out as planned. This may take some troubleshooting.
